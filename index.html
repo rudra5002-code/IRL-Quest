@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#090d16" />
+  <title>IRL Quest — Executive Real-Life Gamification Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+  <link rel="stylesheet" href="style.css">
+   
+  
+</head>
+<body>
+  <canvas id="confettiCanvas"></canvas>
+
+  <div class="app-wrapper">
+    <!-- Top Navigation -->
+    <header class="navbar">
+      <div class="brand-section">
+        <div class="brand-icon-box">↗</div>
+        <div class="brand-details">
+          <div class="brand-title-wrap">
+            <span class="brand-title">IRL Quest</span>
+            <span class="brand-version-badge">PRO v2.0</span>
+          </div>
+          <span class="brand-tagline">REALITY ENGINE // DE-ALGORITHMIZE YOUR LIFE</span>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <div class="sync-status-pill">
+          <span class="status-dot"></span>
+          <span>OFFLINE LOCAL SYNC</span>
+        </div>
+
+        <button class="active-quest-pill" id="activeQuestHudBtn" aria-label="View Active Quest">
+          <span class="status-dot"></span>
+          <span id="navTimerDigits">00:00</span>
+          <span>RUNNING ↗</span>
+        </button>
+
+        <button class="nav-btn" id="soundToggleBtn" title="Toggle Sound Effects">
+          <span id="soundIcon">🔊</span>
+          <span id="soundText" class="mono">SFX</span>
+        </button>
+
+        <button class="nav-btn" id="savedQuestsNavBtn" title="Saved Missions">
+          <span>♡</span>
+          <span>SAVED (<span id="savedCountLabel">0</span>)</span>
+        </button>
+
+        <button class="nav-btn nav-btn-icon-only" id="settingsBtn" title="System Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        </button>
+
+        <div class="profile-pill" id="profilePill" title="Player Dossier">
+          <div class="avatar-circle" id="navAvatarCircle">G</div>
+          <span class="avatar-level-label" id="navLevelBadge">LVL 01</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Grid Dashboard -->
+    <main class="dashboard-layout">
+      <!-- Left Column: Operations Stage -->
+      <section class="operations-stage">
+        <!-- Hero Directive -->
+        <div class="hero-panel">
+          <div class="directive-tag">
+            <span>●</span>
+            <span>DIRECTIVE // DISENGAGE DISPLAY</span>
+          </div>
+          <h1 class="hero-title">
+            YOUR LIFE IS<br>
+            <span class="gradient-text">THE PRIMARY CAMPAIGN.</span>
+          </h1>
+          <p class="hero-desc">
+            You've spent enough cycles parsing someone else's feed. Roll an authentic real-world micro-mission, step outside the glass rectangle, and return with genuine personal lore.
+          </p>
+        </div>
+
+        <!-- Player Progression Tier -->
+        <div class="progression-card">
+          <div class="progression-top">
+            <div class="player-rank-info">
+              <span class="rank-badge" id="playerRankBadge">LVL 01</span>
+              <div>
+                <h3 class="rank-title" id="playerRankTitle">Certified Screen Goblin</h3>
+                <p class="rank-subtitle" id="playerRankSubtitle">Origin narrative: one more endless scroll</p>
+              </div>
+            </div>
+            <div class="xp-counter-wrap">
+              <span class="xp-current-text" id="playerXpText">0 / 300 XP</span>
+              <p class="xp-subtext" id="nextLevelNeededText">300 XP to next tier</p>
+            </div>
+          </div>
+          <div class="progress-track" aria-label="Level Progress Bar">
+            <div class="progress-fill" id="playerProgressBar"></div>
+          </div>
+        </div>
+
+        <!-- Featured Mission Card -->
+        <article class="mission-card" id="featuredMissionBox">
+          <div class="mission-ambient-graphic"></div>
+          <div class="mission-watermark-icon" id="missionWatermarkIcon">🧭</div>
+
+          <div class="mission-header">
+            <div class="badge-group">
+              <span class="mission-badge badge-category" id="missionCategoryBadge">🧭 EXPLORE</span>
+              <span class="mission-badge badge-difficulty easy" id="missionDifficultyBadge">EASY TIER</span>
+            </div>
+            <span class="badge-category mono" style="font-size:0.7rem; background:rgba(255,255,255,0.05); color:#94a3b8; border-color:var(--border-subtle)">MISSION PROTOCOL</span>
+          </div>
+
+          <h2 class="mission-title" id="missionTitle">The NPC Escape</h2>
+          <p class="mission-desc" id="missionDesc">
+            Step outside for 10 minutes and intentionally take a safe walking route you normally never take. Notice the quiet details. Your personal lore won't author itself.
+          </p>
+
+          <div class="mission-meta-grid">
+            <span class="meta-chip" id="missionDurationChip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span id="missionTimeVal">10 MIN</span>
+            </span>
+            <span class="meta-chip xp-chip" id="missionXpChip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              <span id="missionXpVal">+100 XP REWARD</span>
+            </span>
+            <span class="meta-chip" id="missionModeChip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"></circle><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8"></path></svg>
+              <span>SOLO FRIENDLY</span>
+            </span>
+          </div>
+
+          <div class="mission-actions">
+            <button class="btn-primary" id="startMissionBtn">
+              <span>ACCEPT MISSION</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="7" y1="17" x2="17" y2="7"></line><polyline points="7 7 17 7 17 17"></polyline></svg>
+            </button>
+            <button class="btn-secondary" id="rollMissionBtn">
+              <span>🎲 ROLL ANOTHER</span>
+            </button>
+            <button class="btn-icon-action" id="saveMissionBtn" title="Bookmark Mission">
+              <span id="saveHeartIcon">♡</span>
+              <span id="saveBtnLabel">BOOKMARK</span>
+            </button>
+            <button class="btn-icon-action" id="copyMissionBtn" title="Copy Mission Brief">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              <span>SHARE</span>
+            </button>
+          </div>
+        </article>
+
+        <!-- Category Explorer -->
+        <div class="section-header-wrap">
+          <div>
+            <div class="section-eyebrow">// DOMAINS OF REALITY</div>
+            <h3 class="section-title">Select a Mission Category</h3>
+          </div>
+          <div class="filters-bar">
+            <div class="custom-select-wrap">
+              <select class="custom-select" id="timeFilterSelect" aria-label="Filter by Duration">
+                <option value="any">Any Duration</option>
+                <option value="5">Micro (5–10 min)</option>
+                <option value="15">Moderate (15 min)</option>
+                <option value="30">Extended (20–30+ min)</option>
+              </select>
+              <span class="select-chevron">▾</span>
+            </div>
+            <div class="custom-select-wrap">
+              <select class="custom-select" id="difficultyFilterSelect" aria-label="Filter by Difficulty">
+                <option value="any">Any Difficulty</option>
+                <option value="easy">Easy Tier</option>
+                <option value="medium">Medium Tier</option>
+                <option value="hard">Hard Tier</option>
+              </select>
+              <span class="select-chevron">▾</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="category-cards-grid" id="categoryCardsGrid">
+          <!-- Explore -->
+          <div class="category-card" data-cat="explore" tabindex="0">
+            <div class="category-top-row">
+              <div class="category-icon-wrap">🧭</div>
+              <span class="category-count-badge">5 MISSIONS</span>
+            </div>
+            <div>
+              <h4 class="category-title">Explore</h4>
+              <p class="category-desc">Break automated daily pathing. Discover local anomalies and new routes.</p>
+            </div>
+            <div class="category-footer"><span>DISCOVERY XP</span> <span>→</span></div>
+          </div>
+
+          <!-- Social DLC -->
+          <div class="category-card" data-cat="social" tabindex="0">
+            <div class="category-top-row">
+              <div class="category-icon-wrap">🫂</div>
+              <span class="category-count-badge">5 MISSIONS</span>
+            </div>
+            <div>
+              <h4 class="category-title">Social DLC</h4>
+              <p class="category-desc">High-value human connection. Optional tutorial, genuine co-op.</p>
+            </div>
+            <div class="category-footer"><span>CONNECTION XP</span> <span>→</span></div>
+          </div>
+
+          <!-- Create -->
+          <div class="category-card" data-cat="create" tabindex="0">
+            <div class="category-top-row">
+              <div class="category-icon-wrap">🎨</div>
+              <span class="category-count-badge">5 MISSIONS</span>
+            </div>
+            <div>
+              <h4 class="category-title">Creative Mode</h4>
+              <p class="category-desc">Produce analog art, micro-poetry, or notes. No perfection required.</p>
+            </div>
+            <div class="category-footer"><span>CREATIVE XP</span> <span>→</span></div>
+          </div>
+
+          <!-- Movement -->
+          <div class="category-card" data-cat="move" tabindex="0">
+            <div class="category-top-row">
+              <div class="category-icon-wrap">🏃</div>
+              <span class="category-count-badge">5 MISSIONS</span>
+            </div>
+            <div>
+              <h4 class="category-title">Kinetic Movement</h4>
+              <p class="category-desc">Calibrate your physical avatar. Strides, stretches, and sunlight.</p>
+            </div>
+            <div class="category-footer"><span>VITALITY XP</span> <span>→</span></div>
+          </div>
+
+          <!-- Learn -->
+          <div class="category-card" data-cat="learn" tabindex="0">
+            <div class="category-top-row">
+              <div class="category-icon-wrap">🧠</div>
+              <span class="category-count-badge">5 MISSIONS</span>
+            </div>
+            <div>
+              <h4 class="category-title">Cognition & Lore</h4>
+              <p class="category-desc">Collect tactile knowledge from physical spaces, books, and landmarks.</p>
+            </div>
+            <div class="category-footer"><span>INTELLECT XP</span> <span>→</span></div>
+          </div>
+
+          <!-- Chaotic Good -->
+          <div class="category-card" data-cat="chaos" tabindex="0">
+            <div class="category-top-row">
+              <div class="category-icon-wrap">🎲</div>
+              <span class="category-count-badge">5 MISSIONS</span>
+            </div>
+            <div>
+              <h4 class="category-title">Chaotic Good</h4>
+              <p class="category-desc">Low-stakes randomness, serendipity, and harmless offline surprises.</p>
+            </div>
+            <div class="category-footer"><span>CHAOS XP</span> <span>→</span></div>
+          </div>
+        </div>
+
+        <!-- Rules & AI Quest Synthesizer Subgrid -->
+        <div class="utility-grid">
+          <!-- Protocol Rules -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <h4 class="card-heading">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span>OPERATIONAL PROTOCOL</span>
+              </h4>
+              <span class="brand-version-badge">PATCH v2.0</span>
+            </div>
+            <ul class="rules-list">
+              <li class="rule-item">
+                <span class="rule-num">01.</span>
+                <span>Select a mission that aligns safely with your physical surroundings.</span>
+              </li>
+              <li class="rule-item">
+                <span class="rule-num">02.</span>
+                <span>Put this screen in sleep mode or slip the device into your pocket.</span>
+              </li>
+              <li class="rule-item">
+                <span class="rule-num">03.</span>
+                <span>Complete the objective purely in the physical layer.</span>
+              </li>
+              <li class="rule-item">
+                <span class="rule-num">04.</span>
+                <span>Zero telemetry or camera validation required. Honor system rules apply.</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- AI Synthesizer Card -->
+          <div class="glass-card">
+            <div class="glass-card-header">
+              <h4 class="card-heading">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                <span>AI MISSION SYNTHESIZER</span>
+              </h4>
+              <span class="mission-badge badge-category" id="aiEngineStatusBadge">STANDALONE AI</span>
+            </div>
+            <div class="ai-generator-body">
+              <p class="ai-desc-text">
+                Generate dynamic context-aware micro-missions tailored to your exact mood, constraints, and current physical coordinates.
+              </p>
+              <button class="ai-trigger-btn" id="openAiSynthesizerModalBtn">
+                <span>✨ SYNTHESIZE CUSTOM MISSION</span>
+              </button>
+              <div style="font-family:var(--font-mono); font-size:0.7rem; color:var(--text-tertiary); text-align:center;">
+                Client-side generative model active · zero latency
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Player Dashboard & Lore Journal -->
+      <aside class="sidebar-wrapper">
+        <!-- Player Statistics -->
+        <div class="stats-card">
+          <div class="glass-card-header">
+            <h4 class="card-heading">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+              <span>TACTICAL STATS</span>
+            </h4>
+            <span class="mono" style="font-size:0.72rem; color:var(--text-tertiary);">LIVE RECORD</span>
+          </div>
+          <div class="stats-inner-grid">
+            <div class="metric-cell">
+              <div class="metric-icon">🏆</div>
+              <div class="metric-value" id="statsQuestsDone">0</div>
+              <div class="metric-label">Missions Done</div>
+            </div>
+            <div class="metric-cell">
+              <div class="metric-icon">🔥</div>
+              <div class="metric-value" id="statsDayStreak">0</div>
+              <div class="metric-label">Day Streak</div>
+            </div>
+            <div class="metric-cell">
+              <div class="metric-icon">🧭</div>
+              <div class="metric-value" id="statsCategoriesExplored">0</div>
+              <div class="metric-label">Categories</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trophy & Achievements Showcase -->
+        <div class="achievements-card">
+          <div class="glass-card-header">
+            <h4 class="card-heading">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg>
+              <span>ACHIEVEMENTS</span>
+            </h4>
+            <span class="achievement-status-tag" id="achievementsCountBadge">0 / 6 UNLOCKED</span>
+          </div>
+          <div class="achievements-list" id="achievementsListContainer">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+
+        <!-- Lore History Ledger -->
+        <div class="lore-card">
+          <div class="glass-card-header">
+            <h4 class="card-heading">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+              <span>LORE ARCHIVE</span>
+            </h4>
+            <button class="nav-btn nav-btn-icon-only" id="resetDemoHistoryBtn" title="Reset Demo Progress" style="padding:4px 8px; font-size:0.75rem;">
+              RESET
+            </button>
+          </div>
+          <div class="history-items-list" id="loreHistoryContainer">
+            <div class="empty-state-notice">
+              No field lore recorded yet. Complete an objective to begin populating your personal chronicle.
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer-bar">
+      <span>IRL QUEST // BUILT TO BE CLOSED & LIVED IN REALITY</span>
+      <span>HIGH-PERFORMANCE ARCHITECTURE · ZERO TELEMETRY · LOCAL-FIRST</span>
+      <span>STEP OUTSIDE. AUTHOR YOUR LORE.</span>
+    </footer>
+  </div>
+
+  <!-- Active Quest HUD Modal -->
+  <div class="modal-overlay" id="questHudModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-eyebrow">// MISSION PROTOCOL ACTIVE</div>
+      <h2 class="modal-title" id="hudModalTitle">Mission In Progress</h2>
+      <p class="modal-desc" id="hudModalDesc">Execute the task in reality. Leave your notifications behind.</p>
+
+      <!-- Circular Timer HUD -->
+      <div class="timer-hud-container">
+        <div class="timer-ring-wrapper">
+          <svg class="timer-svg" viewBox="0 0 180 180">
+            <circle class="timer-bg-circle" cx="90" cy="90" r="80"></circle>
+            <circle class="timer-progress-circle" id="timerProgressRing" cx="90" cy="90" r="80"></circle>
+          </svg>
+          <div class="timer-center-info">
+            <div class="timer-digits" id="modalTimerDigits">10:00</div>
+            <div class="timer-status-caption" id="timerStatusLabel">ELAPSED CLOCK</div>
+          </div>
+        </div>
+        <div class="timer-controls-row">
+          <button class="timer-btn-sub" id="timerPauseBtn">PAUSE</button>
+          <button class="timer-btn-sub" id="timerAddFiveBtn">+5 MIN</button>
+          <button class="timer-btn-sub" id="timerResetBtn">RESET</button>
+        </div>
+      </div>
+
+      <!-- Optional Lore Note Input -->
+      <div id="completionNoteContainer" style="display:none;">
+        <label for="userLoreNoteInput" style="font-family:var(--font-mono); font-size:0.75rem; color:var(--emerald-light); display:block; margin-bottom:6px;">
+          FIELD OBSERVATION / LORE NOTES (OPTIONAL):
+        </label>
+        <textarea id="userLoreNoteInput" class="lore-note-field" placeholder="What did you observe? Who did you see? Write a quick sentence for your archive..."></textarea>
+      </div>
+
+      <div class="modal-notice-banner" id="hudModalNotice">
+        <span style="font-size:18px;">🌱</span>
+        <span>The countdown is a pacing guide, not an interrogation. Stay safe and disengage early if needed.</span>
+      </div>
+
+      <div class="modal-footer-actions" id="hudModalActions">
+        <button class="btn-primary" id="finishMissionBtn">
+          <span>I COMPLETED THE MISSION ✓</span>
+        </button>
+        <button class="btn-secondary" id="minimizeHudBtn">
+          <span>MINIMIZE TO HUD</span>
+        </button>
+        <button class="btn-icon-action" id="abortMissionBtn" style="color:var(--text-tertiary)">
+          <span>ABORT</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Mission Synthesizer Modal -->
+  <div class="modal-overlay" id="aiSynthesizerModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-eyebrow">// NEURAL GENERATIVE ENGINE</div>
+      <h2 class="modal-title">Synthesize Custom Mission</h2>
+      <p class="modal-desc">Configure your available bandwidth to generate a brand new tailored IRL objective.</p>
+
+      <div style="display:flex; flex-direction:column; gap:14px; margin-bottom:20px;">
+        <div>
+          <label style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-secondary); display:block; margin-bottom:6px;">CURRENT ENVIRONMENT</label>
+          <select class="custom-select" id="aiEnvSelect" style="width:100%;">
+            <option value="outdoor">Outdoors / Street / Park</option>
+            <option value="home">Indoor / Desk / Apartment</option>
+            <option value="commute">Commute / Transit / Walking</option>
+            <option value="public">Cafe / Library / Public Space</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-secondary); display:block; margin-bottom:6px;">ENERGY LEVEL</label>
+          <select class="custom-select" id="aiEnergySelect" style="width:100%;">
+            <option value="chill">Low Energy / Restorative</option>
+            <option value="medium">Moderate / Inquisitive</option>
+            <option value="high">High Energy / Adventurous</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-secondary); display:block; margin-bottom:6px;">CUSTOM PROMPT OR MOOD (OPTIONAL)</label>
+          <input type="text" id="aiCustomPromptInput" class="custom-select" style="width:100%;" placeholder="e.g. feeling restless after coding for 4 hours, need fresh air">
+        </div>
+      </div>
+
+            
+      <div id="aiGeneratingIndicator" class="ai-loading-panel" style="display: none;">
+        <div class="ai-loading-spinner"></div>
+
+        <div class="ai-loading-title">
+          Qwen3 is crafting your mission<span class="ai-loading-dots"></span>
+        </div>
+
+        <p id="aiLoadingTip" class="ai-loading-tip">
+          🌿 Nature is waiting for you outside.
+        </p>
+
+        <div class="ai-loading-progress">
+          <div class="ai-loading-progress-bar"></div>
+        </div>
+
+        <div class="ai-loading-caption">
+          Your next real-life adventure is on its way...
+        </div>
+      </div>
+
+
+      <div class="modal-footer-actions">
+        <button class="btn-primary" id="runAiGenerationBtn">
+          <span>✨ GENERATE MISSION</span>
+        </button>
+        <button class="btn-secondary" id="closeAiModalBtn">
+          <span>CANCEL</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Saved Quests Modal -->
+  <div class="modal-overlay" id="savedQuestsModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-eyebrow">// BOOKMARKED PROTOCOLS</div>
+      <h2 class="modal-title">Saved Missions</h2>
+      <p class="modal-desc">Missions you have queued up for opportune moments in your schedule.</p>
+
+      <div id="savedQuestsListContainer" style="display:flex; flex-direction:column; gap:10px; max-height:300px; overflow-y:auto; margin-bottom:22px; padding-right:4px;">
+        <!-- Populated dynamically -->
+      </div>
+
+      <div class="modal-footer-actions">
+        <button class="btn-secondary" id="closeSavedModalBtn" style="width:100%;">
+          <span>CLOSE</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="modal-eyebrow">// SYSTEM CONFIGURATION</div>
+      <h2 class="modal-title">Player Profile & Preferences</h2>
+      <p class="modal-desc">Personalize your character identifiers and export or import your offline progress data.</p>
+
+      <div style="display:flex; flex-direction:column; gap:16px; margin-bottom:24px;">
+        <div>
+          <label style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-secondary); display:block; margin-bottom:6px;">CODENAME / PLAYER HANDLE</label>
+          <input type="text" id="settingPlayerNameInput" class="custom-select" style="width:100%;" value="Screen Goblin">
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn-secondary" id="exportSaveBtn" style="flex:1;">
+            <span>📥 EXPORT SAVE JSON</span>
+          </button>
+          <button class="btn-secondary" id="importSaveBtn" style="flex:1;">
+            <span>📤 IMPORT SAVE JSON</span>
+          </button>
+          <input type="file" id="importSaveFileInput" accept=".json" style="display:none;">
+        </div>
+      </div>
+
+      <div class="modal-footer-actions">
+        <button class="btn-primary" id="saveSettingsBtn">
+          <span>SAVE PREFERENCES</span>
+        </button>
+        <button class="btn-secondary" id="closeSettingsModalBtn">
+          <span>CLOSE</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  
+<!-- Player Profile / Level Modal -->
+<div class="modal-overlay" id="playerProfileModal"
+     role="dialog" aria-modal="true"
+     aria-labelledby="playerProfileTitle">
+
+  <div class="modal-card">
+    <div class="modal-eyebrow">// PLAYER STATUS</div>
+    <h2 class="modal-title" id="playerProfileTitle">
+      Player Profile
+    </h2>
+    <p class="modal-desc">
+      Your real-world progress, rank, and achievements.
+    </p>
+
+    <div class="glass-card" style="margin-bottom:16px;">
+      <h3 id="profilePlayerName">Screen Goblin</h3>
+      <p id="profileRankTitle" style="margin-top:8px;">
+        Certified Screen Goblin
+      </p>
+
+      <div class="progress-track">
+        <div class="progress-fill" id="profileProgressBar"></div>
+      </div>
+
+      <p id="profileXpText" style="margin-top:10px;">
+        0 / 300 XP
+      </p>
+      <p id="profileNextLevelText">300 XP to next level</p>
+    </div>
+
+    <div class="utility-grid" style="margin-bottom:20px;">
+      <div class="glass-card">
+        <p class="section-eyebrow">TOTAL XP</p>
+        <h3 id="profileTotalXp">0</h3>
+      </div>
+
+      <div class="glass-card">
+        <p class="section-eyebrow">MISSIONS DONE</p>
+        <h3 id="profileCompletedCount">0</h3>
+      </div>
+
+      <div class="glass-card">
+        <p class="section-eyebrow">CURRENT STREAK</p>
+        <h3 id="profileStreak">0 days</h3>
+      </div>
+
+      <div class="glass-card">
+        <p class="section-eyebrow">SAVED MISSIONS</p>
+        <h3 id="profileSavedCount">0</h3>
+      </div>
+    </div>
+
+    <div class="modal-footer-actions">
+      <button class="btn-secondary" id="closePlayerProfileBtn">
+        CLOSE PROFILE
+      </button>
+    </div>
+  </div>
+</div>
+
+
+  <!-- Toast Notification Bar -->
+  <div class="toast-container" id="toastNotice" role="alert">
+    <span id="toastIcon">✨</span>
+    <span id="toastMessage">Tactical mission updated.</span>
+  </div>
+
+  <script src="index.js">
+   
+
+  </script>
+</body>
+</html>
