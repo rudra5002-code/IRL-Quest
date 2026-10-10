@@ -66,14 +66,6 @@ Run `index.html` using the VS Code **Live Server** extension.
 
 IRL Quest aims to make real-life activities more engaging through gamification, while encouraging users to take breaks from screens and interact with the world around them.
 
-## 🔮 Future Improvements
-
-- More mission categories and difficulty levels
-- Additional achievements and ranks
-- Improved AI-generated mission personalization
-- Optional daily quests and streaks
-- Enhanced mobile-friendly experience
-
 ## 🤝 Contributing
 
 Suggestions, bug reports, and contributions are welcome! Feel free to open an issue or submit a pull request.
